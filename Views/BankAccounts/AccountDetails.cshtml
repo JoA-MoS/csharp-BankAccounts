@@ -1,0 +1,63 @@
+@model CreateTransactionViewModel
+@{
+    ViewData["Title"] = @ViewBag.bankAccount.Name;
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<h3>
+    Balance - @String.Format("{0:C2}", @ViewBag.bankAccount.Balance)
+</h3>
+
+<form asp-controller="BankAccounts" asp-action="CreateTransaction" method="post"> 
+    <!-- <div asp-validation-summary="All" class="text-danger"></div> -->
+
+     <div class="form-group">
+        <label asp-for="Description" class="control-label"></label>
+        <input asp-for="Description" class="form-control" >
+        <span asp-validation-for="Description" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Amount" class="control-label"></label>
+        <input type="number" asp-for="Amount" class="form-control" min="@(ViewBag.bankAccount.Balance*-1)">
+        <span asp-validation-for="Amount" class="text-danger"></span>
+    </div>
+   
+
+    <div class="form-group">
+        <div class="pull-right">
+            <button type="submit" class="btn btn-primary">Post Transaction</button>
+        </div>
+         &nbsp;
+    </div>
+</form>
+
+
+<table class="table table-striped table-hover">
+    <thead>
+        <tr>
+            <th>Description</th>
+            <th>Amount</th>
+            <th>Date</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(Transaction t in  @ViewBag.bankAccount.Transactions)
+        {
+            <tr>
+                <td>@t.Description</td>
+                <td>@String.Format("{0:C2}", t.Amount)</td>
+                <td>@t.Created</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
+
+
+

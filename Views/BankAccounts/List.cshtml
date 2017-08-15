@@ -1,0 +1,21 @@
+@model ApplicationUser
+@{
+    ViewData["Title"] = "Your Accounts";
+}
+
+<h2>@ViewData["Title"]</h2>
+<hr />
+
+<ul>
+    @foreach(BankAccount b in @Model.BankAccounts){
+        <li><a asp-area="" asp-controller="BankAccounts" asp-action="GetAccount" asp-route-accountId="@b.BankAccountId">@b.Name - @String.Format("{0:C2}", @b.Balance)</a></li>
+    }
+    
+</ul>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
+
+
+
