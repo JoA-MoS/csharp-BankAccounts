@@ -105,25 +105,31 @@ namespace BankAccounts.Controllers {
             BankAccount bankAccount = _context.BankAccounts.Where(ba => ba.BankAccountId == accountId)
                                                             .Include(ba => ba.Transactions)
                                                             .FirstOrDefault();
-            ViewBag.bankAccount = bankAccount;
-            if (ModelState.IsValid) {
-                // _userManager.GetUserName(User);
-                if (model.Amount + bankAccount.Balance >= 0) {
-                    Transaction trans = new Transaction {
-                        Amount = model.Amount,
-                        Description = model.Description,
-                        BankAccountId = accountId,
-                        CreatedById = userId,
-                        ModifiedById = userId
-                    };
-                    _context.Transactions.Add(trans);
-                    _context.SaveChanges();
-                    System.Console.WriteLine("++++++++++++++++++++VALID+++++++++++++++++++");
-                    return RedirectToAction("GetAccount", new { accountId = accountId });
+
+            if (bankAccount.OwnerId == userId) {
+                ViewBag.bankAccount = bankAccount;
+                if (ModelState.IsValid) {
+                    // _userManager.GetUserName(User);
+                    if (model.Amount + bankAccount.Balance >= 0) {
+                        Transaction trans = new Transaction {
+                            Amount = model.Amount,
+                            Description = model.Description,
+                            BankAccountId = accountId,
+                            CreatedById = userId,
+                            ModifiedById = userId
+                        };
+                        _context.Transactions.Add(trans);
+                        _context.SaveChanges();
+                        System.Console.WriteLine("++++++++++++++++++++VALID+++++++++++++++++++");
+                        return RedirectToAction("GetAccount", new { accountId = accountId });
+                    }
+                    else {
+                        ModelState.AddModelError("Amount", "Transaction amount cannot make account balance less than $0.00");
+                    }
                 }
-                else {
-                    ModelState.AddModelError("Amount", "Transaction amount cannot make account balance less than $0.00");
-                }
+            }
+            else {
+                ModelState.AddModelError("", "You did something weird and are trying to post a transaction to an account you don't own");
             }
 
             System.Console.WriteLine("--------------------NOT VALID--------------------");
